@@ -78,4 +78,4 @@ async def email(request):
 
 if __name__ == "__main__":
     app.error_handler.add(NotFound,lambda r, e: empty(status=404))
-    app.run(host='127.0.0.1', port=8008,protocol=WebSocketProtocol,auto_reload=True)
+    app.run(host='0.0.0.0', port=8008,protocol=WebSocketProtocol,auto_reload=True)
