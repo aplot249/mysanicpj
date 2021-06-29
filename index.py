@@ -7,9 +7,9 @@ from sanic_cors import CORS
 from sanic.websocket import WebSocketProtocol
 import asyncio,aiohttp
 from lxml import etree
-
 from mycos import client
 from vxpdf import VXUrl2Pdf
+from async_sendemail import send_email
 
 app = sanic.Sanic(name="index")
 CORS(app)
@@ -67,6 +67,15 @@ async def vpnsoftware(request):
             json_content.append({"content":content,"href":href})
     return json(json_content)
 
+@app.post('/email')
+async def email(request):
+    toemail = request.form['toemail'][0]
+    title = request.form['title'][0]
+    content = request.form['content'][0]
+    print(toemail,title,content)
+    app.add_task(send_email(toemail,title,content))
+    return json(request.form)
 
-app.error_handler.add(NotFound,lambda r, e: empty(status=404))
-app.run(host='127.0.0.1', port=8008,protocol=WebSocketProtocol,auto_reload=True)
+if __name__ == "__main__":
+    app.error_handler.add(NotFound,lambda r, e: empty(status=404))
+    app.run(host='127.0.0.1', port=8008,protocol=WebSocketProtocol,auto_reload=True)
