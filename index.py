@@ -76,6 +76,21 @@ async def email(request):
     app.add_task(send_email(toemail,title,content))
     return json(request.form)
 
+
+async def send_expire_email(res_dict):
+    for item in res_dict['expired']:
+        toemail = item['email']
+        title = '穿云101账号已经到期'
+        content = '您在网站 http://chuanyun101.com 的外网账号已经到期，如需继续使用，请联系管理员续费。'
+        app.add_task(send_email(toemail, title, content))
+        await asyncio.sleep(30)
+    for item in res_dict["will_expired"]:
+        toemail = item['email']
+        title = '穿云101账号将要到期'
+        content = '您在网站 http://chuanyun101.com 的外网账号还有%s天期限，到期将不能使用，请及时续费。' % item['remaining_days']
+        app.add_task(send_email(toemail, title, content))
+        await asyncio.sleep(30)
+
 @app.get('/expire')
 async def expire(request):
     async with aiohttp.ClientSession() as session:
@@ -84,18 +99,7 @@ async def expire(request):
         print(res)
         import json as myjson
         res_dict = myjson.loads(res)
-        for item in res_dict['expired']:
-            toemail = item['email']
-            title = '穿云101账号已经到期'
-            content = '您在网站 http://chuanyun101.com 的外网账号已经到期，如需继续使用，请联系管理员续费。'
-            app.add_task(send_email(toemail, title, content))
-            await asyncio.sleep(30)
-        for item in res_dict["will_expired"]:
-            toemail = item['email']
-            title = '穿云101账号将要到期'
-            content = '您在网站 http://chuanyun101.com 的外网账号还有%s天期限，到期将不能使用，请及时续费。' % item['remaining_days']
-            app.add_task(send_email(toemail, title, content))
-            await asyncio.sleep(30)
+        app.add_task(send_expire_email(res_dict))
         return json(res)
 
 
