@@ -76,6 +76,29 @@ async def email(request):
     app.add_task(send_email(toemail,title,content))
     return json(request.form)
 
+@app.get('/expire')
+async def expire(request):
+    async with aiohttp.ClientSession() as session:
+        response = await session.get("https://chuanyun101.com/jhsfq/check_expired/")
+        res =await response.text()
+        print(res)
+        import json as myjson
+        res_dict = myjson.loads(res)
+        for item in res_dict['expired']:
+            toemail = item['email']
+            title = '穿云101账号已经到期'
+            content = '您在网站 http://chuanyun101.com 的外网账号已经到期，如需继续使用，请联系管理员续费。'
+            app.add_task(send_email(toemail, title, content))
+            asyncio.sleep(30)
+        for item in res_dict["will_expired"]:
+            toemail = item['email']
+            title = '穿云101账号将要到期'
+            content = '您在网站 http://chuanyun101.com 的外网账号还有%s天期限，到期将不能使用，请及时续费。' % item['remaining_days']
+            app.add_task(send_email(toemail, title, content))
+            asyncio.sleep(30)
+        return json(res)
+
+
 if __name__ == "__main__":
     app.error_handler.add(NotFound,lambda r, e: empty(status=404))
     app.run(host='0.0.0.0', port=8008,protocol=WebSocketProtocol,auto_reload=True)
