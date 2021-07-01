@@ -51,5 +51,6 @@ class VXUrl2Pdf:
 
 
 if __name__ == '__main__':
-    vxpdf = VXUrl2Pdf(url='')
+    url = input("输入链接：")
+    vxpdf = VXUrl2Pdf(url)
     vxpdf.makepdf()
