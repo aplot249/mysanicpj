@@ -1,0 +1,9 @@
+lxml==4.6.3
+sanic==21.3.4
+pdfkit==0.6.1
+cos_python_sdk_v5==1.9.7
+Sanic_Cors==1.0.0
+requests==2.25.1
+wechatsogou==4.5.4
+aiohttp==3.7.4.post0
+qcloud_cos==3.3.6

@@ -13,7 +13,10 @@ class VXUrl2Pdf:
         self.url = url
 
     def get_title(self):
-        html = requests.get(self.url)
+        headers = {
+            'User-agent':"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        }
+        html = requests.get(self.url,headers=headers)
         self.title = re.search('<meta property="og:title" content="(.*?)" />', html.text[:3000]).group(1)
         return self.title
 
