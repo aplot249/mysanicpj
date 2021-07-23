@@ -19,11 +19,12 @@ async def send_email(toemail,title,content):
                 "subject": title,
                 "html": content
             }
-            response = await session.post("http://api.sendcloud.net/apiv2/mail/send",data=data)
-            res = await response.json()
-            print(res['message'])
-            if res['message'] == "请求成功":
-                break
+            # response = await session.post("http://api.sendcloud.net/apiv2/mail/send",data=data)
+            async with aiohttp.request(url="http://api.sendcloud.net/apiv2/mail/send", method='POST', data=data, proxy="http://45.11.92.243:8888") as req:
+                res = await req.json()
+                print(res['message'])
+                if res['message'] == "请求成功":
+                    break
 
 
 if __name__ == "__main__":
