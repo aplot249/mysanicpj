@@ -1,24 +1,23 @@
 #@author: sareeliu
 #@date: 2021/6/24 20:45
 import aiohttp,asyncio
-import re,pathlib,os
+import re,os,pathlib
 from sanic import Blueprint
 from sanic.response import text,json
 from sanic.app import get_event_loop
 from utils.mycos import client
+from utils.saveToWeb import down_img_and_save_to_web
 
 bp_douyin = Blueprint("bp_douyin",url_prefix='douyin')
 
-async def down_upload_video(title,link):
+async def down_upload_video(res_dict):
     async with aiohttp.ClientSession() as session:
-        response = await session.get(link)
+        response = await session.get(res_dict['link2'])
         # content = await response.read()
         # with open(title+'.mp4','wb') as f:
         #     f.write(content)
-        p = pathlib.Path('douyin')
-        if not p.exists():
-            p.mkdir()
-        absolute_path = 'douyin/'+title+'.mp4'
+
+        absolute_path = 'douyin/video/'+res_dict['title']+'.mp4'
         with open(absolute_path, 'wb') as fd:
             while True:
                 chunk = await response.content.read(512)
@@ -29,8 +28,11 @@ async def down_upload_video(title,link):
                 os.fsync(fd.fileno())
         fd.close()
     # #上传
-    resp = await get_event_loop().run_in_executor(None, client.put_object_from_local_file, 'vxfile', absolute_path, pathlib.Path(absolute_path).name)
-    print(resp)
+    await get_event_loop().run_in_executor(None, client.put_object_from_local_file, 'video', absolute_path, pathlib.Path(absolute_path).name)
+    url = client.get_object_url('douyin',pathlib.Path(absolute_path).name)
+    print(url)
+    down_img_and_save_to_web(res_dict['title'],res_dict['img'],url)
+
 
 
 async def get_title(share_link,res_dict):
@@ -80,7 +82,7 @@ async def mylink(request):
     res_dict = {}
     await asyncio.gather(*[get_title(share_link,res_dict),jiekou1(share_link,res_dict),jiekou2(share_link,res_dict)])
     # print(res_dict)
-    get_event_loop().create_task(down_upload_video(title=res_dict['title'],link=res_dict['link2']))
+    get_event_loop().create_task(down_upload_video(res_dict))
     return json(res_dict)
 
 # share_link = "https://v.douyin.com/e418Xn4/"
