@@ -34,7 +34,7 @@ async def down_upload_video(res_dict):
             "img":res_dict['img']
         }
         # resp = await session.post('http://127.0.0.1:8000/video/',data=data)
-        resp = await session.post('http://sanic.chuanyun101.com/video/',data=data)
+        resp = await session.post('http://django.chuanyun101.com/video/',data=data)
         jj = await resp.json()
         print(jj)
 
