@@ -16,29 +16,23 @@ from requests_toolbelt import MultipartEncoder
 # print(img,link)
 import time
 
-# data = {
-#     "title":"标题10",
-#     "link":"http://baidu.com/"+str(time.time())
-# }
-# # /with open('./6.jpg','rb') as f:
-# #     file = f.read()
-# file = {"name":open('./6.jpg','rb')}
-#
-# headers = {
-#     "Content-type":"multipart/form-data;; boundary="
-# }
-# res = requests.post("http://127.0.0.1:8000/video/",data=data,files=file,headers=headers)
-# print(res.json())
+data = {
+    "title":"标题10",
+    "link":"http://baidu.com/",
+    "img":"www，chuayun101fd"
+}
+res = requests.post("http://127.0.0.1:8000/video/",data=data)
+print(res.json())
 
-m = MultipartEncoder(
-    fields={
-        "title":"标题10",
-        "link":"http://baidu.com/"+str(time.time()),
-        'img': ('6.jpg', open('./6.jpg', 'rb'),"jpg"),
-})
+# m = MultipartEncoder(
+#     fields={
+#         "title":"标题10",
+#         "link":"http://baidu.com/"+str(time.time()),
+# 、        'img': ('6.jpg', open('./6.jpg', 'rb'),"jpg"),
+# })
 
-r = requests.post('http://127.0.0.1:8000/video/', data=m, headers={'Content-Type': m.content_type})
-print(r.json())
+# r = requests.post('http://127.0.0.1:8000/video/', data=m, headers={'Content-Type': m.content_type})
+# print(r.json())
 
 # headers = {
 #     "user-agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36",

@@ -1,24 +1,22 @@
 #@author: sareeliu
 #@date: 2021/6/24 20:45
-import aiohttp,asyncio
-import re,os,pathlib
+import aiohttp, asyncio, re, os, pathlib
 from sanic import Blueprint
 from sanic.response import text,json
 from sanic.app import get_event_loop
 from utils.mycos import client
-from utils.saveToWeb import down_img_and_save_to_web
 
 bp_douyin = Blueprint("bp_douyin",url_prefix='douyin')
 
 async def down_upload_video(res_dict):
     async with aiohttp.ClientSession() as session:
         response = await session.get(res_dict['link2'])
-        # content = await response.read()
-        # with open(title+'.mp4','wb') as f:
-        #     f.write(content)
-
-        absolute_path = 'douyin/video/'+res_dict['title']+'.mp4'
-        with open(absolute_path, 'wb') as fd:
+        p = pathlib.Path('video')
+        if not p.exists():
+            p.mkdir()
+        absolute_path = p.joinpath(res_dict['title']+'.mp4')
+        print(absolute_path.resolve())
+        with open(absolute_path.resolve(), 'wb') as fd:
             while True:
                 chunk = await response.content.read(512)
                 if not chunk:
@@ -26,14 +24,19 @@ async def down_upload_video(res_dict):
                 fd.write(chunk)
                 fd.flush()
                 os.fsync(fd.fileno())
-        fd.close()
-    # #上传
-    await get_event_loop().run_in_executor(None, client.put_object_from_local_file, 'video', absolute_path, pathlib.Path(absolute_path).name)
-    url = client.get_object_url('douyin',pathlib.Path(absolute_path).name)
-    print(url)
-    down_img_and_save_to_web(res_dict['title'],res_dict['img'],url)
-
-
+        # #上传
+        await get_event_loop().run_in_executor(None, client.put_object_from_local_file, 'video', absolute_path, absolute_path.name)
+        url = client.get_object_url('video', absolute_path.name)
+        print(url)
+        data = {
+            'title':res_dict['title'],
+            'link':url,
+            "img":res_dict['img']
+        }
+        # resp = await session.post('http://127.0.0.1:8000/video/',data=data)
+        resp = await session.post('http://sanic.chuanyun101.com/video/',data=data)
+        jj = await resp.json()
+        print(jj)
 
 async def get_title(share_link,res_dict):
     async with aiohttp.ClientSession() as session:
@@ -45,19 +48,17 @@ async def get_title(share_link,res_dict):
         res_dict['title'] = title
 
 
-async def jiekou1(share_link,res_dict):
-    async with aiohttp.ClientSession() as session:
-        headers = {
-            'User-Agent':"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36"
-        }
-        response = await session.get(f"https://ouotool.com/dy?url={share_link}",headers=headers)
-        res = await response.text()
-        # print(res)
-        link = re.search('<source src="(?P<link>.*?)"type="video/mp4">',res).group('link')
-        # print(link)
-        res_dict['link1'] = link
-
-
+# async def jiekou1(share_link,res_dict):
+#     async with aiohttp.ClientSession() as session:
+#         headers = {
+#             'User-Agent':"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36"
+#         }
+#         response = await session.get(f"https://ouotool.com/dy?url={share_link}",headers=headers)
+#         res = await response.text()
+#         # print(res)
+#         link = re.search('<source src="(?P<link>.*?)"type="video/mp4">',res).group('link')
+#         # print(link)
+#         res_dict['link1'] = link
 
 async def jiekou2(share_link,res_dict):
     async with aiohttp.ClientSession() as session:
@@ -80,11 +81,12 @@ async def mylink(request):
     if not re.search('^https://v.douyin.com/.*?',share_link):
         return text("分享链接错误")
     res_dict = {}
-    await asyncio.gather(*[get_title(share_link,res_dict),jiekou1(share_link,res_dict),jiekou2(share_link,res_dict)])
+    await asyncio.gather(*[
+        get_title(share_link,res_dict),
+        jiekou2(share_link,res_dict),
+        # jiekou2(share_link,res_dict)
+    ])
     # print(res_dict)
     get_event_loop().create_task(down_upload_video(res_dict))
     return json(res_dict)
 
-# share_link = "https://v.douyin.com/e418Xn4/"
-# loop = asyncio.get_event_loop()
-# loop.run_until_complete(dylink(share_link))
