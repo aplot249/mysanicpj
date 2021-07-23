@@ -1,6 +1,6 @@
 #@author: sareeliu
 #@date: 2021/6/24 20:45
-import aiohttp, asyncio, re, os, pathlib
+import aiohttp, asyncio, re, os, pathlib,time
 from sanic import Blueprint
 from sanic.response import text,json
 from sanic.app import get_event_loop
@@ -45,7 +45,7 @@ async def get_title(share_link,res_dict):
         title = re.search('<title data-react-helmet="true"> (?P<title>.*?) - 抖音</title>',res).groupdict()['title']
         title = re.sub('\s||#','',title)
         print(title)
-        res_dict['title'] = title
+        res_dict['title'] = title+'#'+str(time.time())[:-5]
 
 
 # async def jiekou1(share_link,res_dict):
@@ -89,4 +89,3 @@ async def mylink(request):
     # print(res_dict)
     get_event_loop().create_task(down_upload_video(res_dict))
     return json(res_dict)
-
