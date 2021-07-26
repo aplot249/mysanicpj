@@ -18,4 +18,4 @@ pidfile = '/home/mysanicpj/pid.gunicorn'
 accesslog = '/home/mysanicpj/access.log'
 errorlog = '/home/mysanicpj/error.log'
 # 设置日志记录水平
-loglevel = 'warning'
+# loglevel = 'warning'
