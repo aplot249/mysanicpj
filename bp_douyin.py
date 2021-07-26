@@ -45,7 +45,7 @@ async def get_title(share_link,res_dict):
         title = re.search('<title data-react-helmet="true"> (?P<title>.*?) - 抖音</title>',res).groupdict()['title']
         title = re.sub('\s||#','',title)
         print(title)
-        res_dict['title'] = title+'#'+str(time.time())[:-5]
+        res_dict['title'] = title+'#'+str(time.time())
 
 
 # async def jiekou1(share_link,res_dict):
