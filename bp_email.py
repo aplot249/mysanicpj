@@ -29,14 +29,14 @@ async def send_expire_email(res_dict):
         content = '您在网站 http://chuanyun101.com 的外网账号已经到期，如需继续使用，请联系管理员续费。'
         app = Sanic.get_app()
         app.add_task(send_email(toemail, title, content))
-        await asyncio.sleep(30)
+        await asyncio.sleep(61)
     for item in res_dict["will_expired"]:
         toemail = item['email']
         title = '穿云101账号将要到期'
         content = '您在网站 http://chuanyun101.com 的外网账号还有%s天期限，到期将不能使用，请及时续费。' % item['remaining_days']
         app = Sanic.get_app()
         app.add_task(send_email(toemail, title, content))
-        await asyncio.sleep(30)
+        await asyncio.sleep(61)
 
 # api/email/expire
 # 获取账号过期数据

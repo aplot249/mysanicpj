@@ -1,6 +1,6 @@
 #@author: sareeliu
 #@date: 2021/7/2 10:24
-import requests,re
+import requests,re,aiohttp,asyncio
 from requests_toolbelt import MultipartEncoder
 
 # headers = {
@@ -16,13 +16,13 @@ from requests_toolbelt import MultipartEncoder
 # print(img,link)
 import time
 
-data = {
-    "title":"标题10",
-    "link":"http://baidu.com/",
-    "img":"www，chuayun101fd"
-}
-res = requests.post("http://127.0.0.1:8000/video/",data=data)
-print(res.json())
+# data = {
+#     "title":"标题10",
+#     "link":"http://baidu.com/",
+#     "img":"www，chuayun101fd"
+# }
+# res = requests.post("http://127.0.0.1:8000/video/",data=data)
+# print(res.json())
 
 # m = MultipartEncoder(
 #     fields={
@@ -45,3 +45,24 @@ print(res.json())
 #
 # html = requests.get(url)
 # html.content
+
+headers = {
+    "Referer": "https://www.douyin.com/",
+    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1"
+}
+
+share_link = "https://v.douyin.com/e418Xn4/"
+# session = requests.session()
+# response = session.get(share_link)
+# response.encoding = response.apparent_encoding
+# print(response.text)
+async def get_title(share_link):
+    async with aiohttp.ClientSession() as session:
+        response = await session.get(share_link)
+        res = await response.text()
+        print(res)
+        title = re.search('<title data-react-helmet="true"> (?P<title>.*?) - 抖音</title>',res).groupdict()['title']
+        title = re.sub('\s||#','',title)
+        print(title)
+
+asyncio.get_event_loop().run_until_complete(get_title(share_link))
