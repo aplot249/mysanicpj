@@ -1,5 +1,5 @@
-#@author: sareeliu
-#@date: 2021/6/21 13:51
+# @author: sareeliu
+# @date: 2021/6/21 13:51
 import sanic
 from sanic.response import empty
 from sanic.exceptions import NotFound
@@ -11,13 +11,15 @@ from bp_email import bp_email
 from bp_vpn import bp_vpn
 from bp_vxlink import bp_vxlink
 from bp_douyin import bp_douyin
+from bp_proxy import bp_proxy
+from ql import bp_ql
 
 app = sanic.Sanic(name="index")
 CORS(app)
 
-api = Blueprint.group(bp_email,bp_vpn,bp_vxlink,bp_douyin,url_prefix='api')
+api = Blueprint.group(bp_email, bp_vpn, bp_vxlink, bp_douyin, bp_proxy, bp_ql, url_prefix='api')
 app.blueprint(api)
 
 if __name__ == "__main__":
-    app.error_handler.add(NotFound,lambda r, e: empty(status=404))
-    app.run(host='0.0.0.0', port=8008,protocol=WebSocketProtocol,auto_reload=True)
+    app.error_handler.add(NotFound, lambda r, e: empty(status=404))
+    app.run(host='0.0.0.0', port=8008, protocol=WebSocketProtocol, auto_reload=True)
